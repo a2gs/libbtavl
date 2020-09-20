@@ -19,14 +19,22 @@ INCLUDEPATH = -I./
 LIBS = -lm
 LIBPATH = -L./
 
-all: clean exectag
+all: clean libbtavl exectag
 
-exectag:
+libbtavl:
+	@echo
+	@echo "=== libbtavl ================="
+	$(CC) -o btavl.o -c btavl.c $(CFLAGS) $(LIBS)
+	$(AR) rc libbtavl.a btavl.o
+	$(RANLIB) libbtavl.a
+	-$(RM) btavl.o
+
+exectag: libbtavl
 	@echo
 	@echo "=== Compiling =============="
-	$(CC) -o test test.c btavl.c $(CFLAGS) $(INCLUDEPATH) $(LIBPATH) $(LIBS)
+	$(CC) -o test test.c -lbtavl $(CFLAGS) $(INCLUDEPATH) $(LIBPATH) $(LIBS)
 
 clean:
 	@echo
 	@echo "=== clean_data =============="
-	-$(RM) test core
+	-$(RM) test libbtavl.a core
