@@ -21,13 +21,13 @@
                        __btavl_a_,      \
                        __btavl_b_,      \
                        __btavl_father_, \
-                       __btavl_delta_,  \
+                       __btavl_h,       \
                        __btavl_data_) { \
-                                      __btavl_node_->a = __btavl_a_;           \
-                                      __btavl_node_->b = __btavl_b_;           \
-                                      __btavl_node_->father = __btavl_father_; \
-                                      __btavl_node_->delta  = __btavl_delta_;  \
-                                      __btavl_node_->data   = __btavl_data_;   \
+                                      	__btavl_node_->a = __btavl_a_;           \
+                                      	__btavl_node_->b = __btavl_b_;           \
+                                      	__btavl_node_->father = __btavl_father_; \
+                                      	__btavl_node_->h      = __btavl_h;       \
+                                      	__btavl_node_->data   = __btavl_data_;   \
                                       }
 
 float btavlGetSize(btavl_t *ctx)
@@ -35,10 +35,20 @@ float btavlGetSize(btavl_t *ctx)
 	return(((log(2.236068 * (ctx->n + 2))) / log(1.618034)) - 2);
 }
 
+int btavlIsHead(btavlNode_t *n)
+{
+	return(n->father == NULL ? BTAVL_TRUE : BTAVL_FALSE);
+}
+
+btavlNode_t **btavlGetFather(btavl_t *ctx, btavlNode_t *n)
+{
+	return(btavlIsHead(n) == BTAVL_TRUE ? &(ctx->head) : &(n->father->father));
+}
+
 void *btavlSearch(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 {
-	btavlNode_t *walker  = NULL;
-	int compareResult = 0;
+	btavlNode_t *walker = NULL;
+	int compareResult   = 0;
 
 	BTAVL_SETCOMPARATOR(ctx, comp, compare);
 
@@ -71,7 +81,7 @@ int btavlInsert(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 {
 	btavlNode_t *ins    = NULL;
 	btavlNode_t *walker = NULL;
-	int compareResult = 0;
+	int compareResult   = 0;
 
 	BTAVL_SETCOMPARATOR(ctx, comp, compare);
 
@@ -105,11 +115,8 @@ int btavlInsert(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 
 				BTAVL_FILLNODE(ins, NULL, NULL, walker, 0, data);
 
-				walker->delta--;
 				walker->a = ins;
 
-				if(walker->delta < -1){
-				}
 
 
 				ctx->n++;
@@ -131,11 +138,8 @@ int btavlInsert(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 
 				BTAVL_FILLNODE(ins, NULL, NULL, walker, 0, data);
 
-				walker->delta++;
 				walker->b = ins;
 
-				if(walker->delta > 1){
-				}
 
 
 				ctx->n++;

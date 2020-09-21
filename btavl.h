@@ -4,7 +4,6 @@
 #define __BTAVL_H__ 1
 
 #include <string.h>
-#include <stdint.h>
 
 #define BTAVL_OK    (1)
 #define BTAVL_ERROR (0)
@@ -13,7 +12,7 @@
 
 typedef struct _btavlNode_t{
 	void *data;
-	int8_t delta;
+	unsigned int h;
 	struct _btavlNode_t *a, *b, *father;
 }btavlNode_t;
 
