@@ -27,16 +27,18 @@ int main(int argc, char *argv[])
 {
 	btavl_t btCtx;
 
-	sample_t data1 = {6, "666"}; sample_t data2 = {3, "333"}; sample_t data3 = {2, "222"};
-	sample_t data4 = {8, "888"}; sample_t data5 = {1, "111"}; sample_t data6 = {7, "777"};
-	sample_t data7 = {4, "444"}; sample_t data8 = {5, "555"}; sample_t data9 = {9, "999"};
+	sample_t data1  = {15, "666"}; sample_t data2  = {27, "333"}; sample_t data3 = {49, "222"};
+	sample_t data4  = {10, "888"}; sample_t data5  = { 8, "111"}; sample_t data6 = {67, "777"};
+	sample_t data7  = {59, "444"}; sample_t data8  = { 9, "555"}; sample_t data9 = {13, "999"};
+	sample_t data10 = {20, "444"}; sample_t data11 = {14, "555"};
 	sample_t *dataSearch;
 
 	btavlInit(&btCtx, dataSampleCompare, malloc, free);
 
-	btavlInsert(&btCtx, &data1, NULL); btavlInsert(&btCtx, &data2, NULL); btavlInsert(&btCtx, &data3, NULL);
-	btavlInsert(&btCtx, &data4, NULL); btavlInsert(&btCtx, &data5, NULL); btavlInsert(&btCtx, &data6, NULL);
-	btavlInsert(&btCtx, &data7, NULL); btavlInsert(&btCtx, &data8, NULL); btavlInsert(&btCtx, &data9, NULL);
+	btavlInsert(&btCtx, &data1 , NULL); btavlInsert(&btCtx, &data2 , NULL); btavlInsert(&btCtx, &data3, NULL);
+	btavlInsert(&btCtx, &data4 , NULL); btavlInsert(&btCtx, &data5 , NULL); btavlInsert(&btCtx, &data6, NULL);
+	btavlInsert(&btCtx, &data7 , NULL); btavlInsert(&btCtx, &data8 , NULL); btavlInsert(&btCtx, &data9, NULL);
+	btavlInsert(&btCtx, &data10, NULL); btavlInsert(&btCtx, &data11, NULL);
 
 	btavlDelete(&btCtx, &data4, NULL, BTAVL_FALSE);
 	btavlDelete(&btCtx, &data9, NULL, BTAVL_FALSE);

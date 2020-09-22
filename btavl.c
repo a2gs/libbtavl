@@ -37,12 +37,49 @@ float btavlGetSize(btavl_t *ctx)
 
 int btavlIsHead(btavlNode_t *n)
 {
+	/* or: return(n->h == 0 ? BTAVL_TRUE : BTAVL_FALSE); */
 	return(n->father == NULL ? BTAVL_TRUE : BTAVL_FALSE);
 }
 
 btavlNode_t **btavlGetFather(btavl_t *ctx, btavlNode_t *n)
 {
 	return(btavlIsHead(n) == BTAVL_TRUE ? &(ctx->head) : &(n->father->father));
+}
+
+int btavlSLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Simple Left Rotation */
+{
+	*top = b;
+	b->a = a;
+	b->b = c;
+
+	return(BTAVL_TRUE);
+}
+
+int btavlSRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Simple Right Rotation */
+{
+	*top = b;
+	b->a = c;
+	b->b = a;
+
+	return(BTAVL_TRUE);
+}
+
+int btavlDLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Double Left Rotation */
+{
+	*top = c;
+	c->a = a;
+	c->b = b;
+
+	return(BTAVL_TRUE);
+}
+
+int btavlDRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Double Right Rotation */
+{
+	*top = c;
+	c->a = b;
+	c->b = a;
+
+	return(BTAVL_TRUE);
 }
 
 void *btavlSearch(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
@@ -82,6 +119,7 @@ int btavlInsert(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 	btavlNode_t *ins    = NULL;
 	btavlNode_t *walker = NULL;
 	int compareResult   = 0;
+	unsigned int h      = 0;
 
 	BTAVL_SETCOMPARATOR(ctx, comp, compare);
 
@@ -99,7 +137,7 @@ int btavlInsert(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 		return(BTAVL_OK);
 	}
 
-	for(walker = ctx->head; ; ){
+	for(walker = ctx->head, h = 1; ; h++){
 
 		compareResult = comp(data, walker->data);
 
