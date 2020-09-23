@@ -38,4 +38,13 @@ int btavlDelete(btavl_t *ctx, void *data, int (*compare)(void *a, void *b), int 
 int btavlInsert(btavl_t *ctx, void *data, int (*compare)(void *a, void *b));
 int btavlInit(btavl_t *ctx, int (*compare) (void *a, void *b), void *(*alloc) (size_t size), void (*dealloc) (void *data));
 
+#ifdef BTAVL_TRANSVERSAL
+typedef struct _btavlFetch_t{
+	btavlNode_t *walker;
+}btavlFetch_t;
+
+int btavl_InitTranversal(btavl_t *ctx, btavlFetch_t *f);
+void *btavl_FetchTranversal(btavlFetch_t *f);
+#endif
+
 #endif

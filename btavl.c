@@ -122,6 +122,23 @@ void *btavlSearch(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 	return(walker->data);
 }
 
+#ifdef BTAVL_TRANSVERSAL
+int btavl_InitTranversal(btavl_t *ctx, btavlFetch_t *f)
+{
+	f->walker = ctx->head;
+	return(BTAVL_OK);
+}
+
+void *btavl_FetchTranversal(btavlFetch_t *f)
+{
+	if(f->walker == NULL)
+		return(NULL);
+
+	f->walker = f->walker->next;
+	return(f->walker->data);
+}
+#endif
+
 int btavlDelete(btavl_t *ctx, void *data, int (*compare)(void *a, void *b), int callDataDealloc)
 {
 	/*BTAVL_SETCOMPARATOR(ctx, comp, compare);*/
@@ -150,15 +167,13 @@ int btavlInsert(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 
 #ifdef BTAVL_TRANSVERSAL
 		BTAVL_FILLNODE(ins, NULL, NULL, NULL, 0, data, ctx->end, NULL);
+		ctx->end  = ins;
 #else
 		BTAVL_FILLNODE(ins, NULL, NULL, NULL, 0, data);
 #endif
 
 		ctx->head = ins;
 		ctx->n    = 1;
-#ifdef BTAVL_TRANSVERSAL
-		ctx->end  = ins;
-#endif
 
 		return(BTAVL_OK);
 	}
