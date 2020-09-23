@@ -60,7 +60,7 @@ int btavlIsHead(btavlNode_t *n)
 	return(n->father == NULL ? BTAVL_TRUE : BTAVL_FALSE);
 }
 
-btavlNode_t **btavlGetFather(btavl_t *ctx, btavlNode_t *n)
+btavlNode_t ** btavlGetFather(btavl_t *ctx, btavlNode_t *n)
 {
 	return(btavlIsHead(n) == BTAVL_TRUE ? &(ctx->head) : &(n->father->father));
 }
@@ -70,6 +70,7 @@ int btavlSLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) 
 	*top = b;
 	b->a = a;
 	b->b = c;
+	a->a = a->b = c->a = c->b = NULL;
 
 	return(BTAVL_TRUE);
 }
@@ -79,6 +80,7 @@ int btavlSRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) 
 	*top = b;
 	b->a = c;
 	b->b = a;
+	a->a = a->b = c->a = c->b = NULL;
 
 	return(BTAVL_TRUE);
 }
@@ -88,6 +90,7 @@ int btavlDLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) 
 	*top = c;
 	c->a = a;
 	c->b = b;
+	a->a = a->b = b->a = b->b = NULL;
 
 	return(BTAVL_TRUE);
 }
@@ -97,11 +100,12 @@ int btavlDRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) 
 	*top = c;
 	c->a = b;
 	c->b = a;
+	a->a = a->b = b->a = b->b = NULL;
 
 	return(BTAVL_TRUE);
 }
 
-void *btavlSearch(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
+void * btavlSearch(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 {
 	btavlNode_t *walker = NULL;
 	int compareResult   = 0;
@@ -123,13 +127,13 @@ void *btavlSearch(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 }
 
 #ifdef BTAVL_TRANSVERSAL
-int btavl_InitTranversal(btavl_t *ctx, btavlFetch_t *f)
+void * btavl_InitTranversal(btavl_t *ctx, btavlFetch_t *f)
 {
 	f->walker = ctx->head;
-	return(BTAVL_OK);
+	return(f->walker->data);
 }
 
-void *btavl_FetchTranversal(btavlFetch_t *f)
+void * btavl_FetchTranversal(btavlFetch_t *f)
 {
 	if(f->walker == NULL)
 		return(NULL);
@@ -167,7 +171,7 @@ int btavlInsert(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 
 #ifdef BTAVL_TRANSVERSAL
 		BTAVL_FILLNODE(ins, NULL, NULL, NULL, 0, data, ctx->end, NULL);
-		ctx->end  = ins;
+		ctx->end = ins;
 #else
 		BTAVL_FILLNODE(ins, NULL, NULL, NULL, 0, data);
 #endif

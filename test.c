@@ -27,8 +27,8 @@ int main(int argc, char *argv[])
 {
 	btavl_t ctx;
 #ifdef BTAVL_TRANSVERSAL
-	btavlFetch_t fetch;
-	sample_t *dataFetch;
+	btavlFetch_t *fetch = NULL;
+	sample_t *dataFetch = NULL;
 #endif
 
 	sample_t data1  = {15, "aaa"}; sample_t data2  = {27, "bbb"}; sample_t data3 = {49, "ccc"};
@@ -54,12 +54,8 @@ int main(int argc, char *argv[])
 		printf("Search: [%s]\n", dataSearch->y);
 
 #ifdef BTAVL_TRANSVERSAL
-	if(btavl_InitTranversal(&ctx, &fetch) == BTAVL_OK){
-		for(dataFetch = btavl_FetchTranversal(&fetch); ;dataFetch = btavl_FetchTranversal(&fetch)){
-			printf("Data x: [%d] | y: [%s]\n", dataFetch->x, dataFetch->y);
-		}
-	}else{
-		printf("Unable transfersal the tree.\n");
+	for(btavl_InitTranversal(&ctx, fetch); fetch != NULL; dataFetch = btavl_FetchTranversal(fetch)){
+		printf("Data x: [%d] | y: [%s]\n", dataFetch->x, dataFetch->y);
 	}
 #endif
 
