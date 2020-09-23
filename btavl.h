@@ -14,6 +14,10 @@ typedef struct _btavlNode_t{
 	void *data;
 	unsigned int h;
 	struct _btavlNode_t *a, *b, *father;
+
+#ifdef BTAVL_TRANSVERSAL
+	struct _btavlNode_t *prev, *next;
+#endif
 }btavlNode_t;
 
 typedef struct _btavl_t{
@@ -22,6 +26,10 @@ typedef struct _btavl_t{
 	void *(*defaultAllocator)  (size_t size);
 	btavlNode_t *head;
 	unsigned long n;
+
+#ifdef BTAVL_TRANSVERSAL
+	struct _btavlNode_t *end;
+#endif
 }btavl_t;
 
 float btavlGetSize(btavl_t *ctx);

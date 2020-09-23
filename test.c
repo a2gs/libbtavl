@@ -49,5 +49,8 @@ int main(int argc, char *argv[])
 	if(dataSearch != NULL)
 		printf("Search: [%s]\n", dataSearch->y);
 
+#ifdef BTAVL_TRANSVERSAL
+#endif
+
 	return(0);
 }

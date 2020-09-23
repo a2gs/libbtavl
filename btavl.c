@@ -17,6 +17,24 @@
                                                 	else                                     __btavl_comp_ = __btavl_ctx_->defaultCompare; \
                                                 }
 
+#ifdef BTAVL_TRANSVERSAL
+#define BTAVL_FILLNODE(__btavl_node_,   \
+                       __btavl_a_,      \
+                       __btavl_b_,      \
+                       __btavl_father_, \
+                       __btavl_h,       \
+                       __btavl_data_,   \
+                       __btavl_prev_,   \
+                       __btavl_next_) { \
+                                      	__btavl_node_->a = __btavl_a_;           \
+                                      	__btavl_node_->b = __btavl_b_;           \
+                                      	__btavl_node_->father = __btavl_father_; \
+                                      	__btavl_node_->h      = __btavl_h;       \
+                                      	__btavl_node_->data   = __btavl_data_;   \
+                                      	__btavl_node_->prev   = __btavl_prev_;   \
+                                      	__btavl_node_->next   = __btavl_next_;   \
+                                      }
+#else
 #define BTAVL_FILLNODE(__btavl_node_,   \
                        __btavl_a_,      \
                        __btavl_b_,      \
@@ -29,6 +47,7 @@
                                       	__btavl_node_->h      = __btavl_h;       \
                                       	__btavl_node_->data   = __btavl_data_;   \
                                       }
+#endif
 
 float btavlGetSize(btavl_t *ctx)
 {
@@ -129,10 +148,17 @@ int btavlInsert(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 			return(BTAVL_ERROR);
 		}
 
+#ifdef BTAVL_TRANSVERSAL
+		BTAVL_FILLNODE(ins, NULL, NULL, NULL, 0, data, ctx->end, NULL);
+#else
 		BTAVL_FILLNODE(ins, NULL, NULL, NULL, 0, data);
+#endif
 
 		ctx->head = ins;
 		ctx->n    = 1;
+#ifdef BTAVL_TRANSVERSAL
+		ctx->end  = ins;
+#endif
 
 		return(BTAVL_OK);
 	}
@@ -151,7 +177,11 @@ int btavlInsert(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 					return(BTAVL_ERROR);
 				}
 
+#ifdef BTAVL_TRANSVERSAL
+				BTAVL_FILLNODE(ins, NULL, NULL, walker, 0, data, ctx->end, NULL);
+#else
 				BTAVL_FILLNODE(ins, NULL, NULL, walker, 0, data);
+#endif
 
 				walker->a = ins;
 
@@ -174,7 +204,11 @@ int btavlInsert(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 					return(BTAVL_ERROR);
 				}
 
+#ifdef BTAVL_TRANSVERSAL
+				BTAVL_FILLNODE(ins, NULL, NULL, walker, 0, data, ctx->end, NULL);
+#else
 				BTAVL_FILLNODE(ins, NULL, NULL, walker, 0, data);
+#endif
 
 				walker->b = ins;
 
@@ -211,6 +245,10 @@ int btavlInit(btavl_t *ctx,
 	ctx->defaultCompare     = compare;
 	ctx->defaultAllocator   = alloc;
 	ctx->defaultDeallocator = dealloc;
+
+#ifdef BTAVL_TRANSVERSAL
+	ctx->end = NULL;
+#endif
 
 	return(BTAVL_OK);
 }
