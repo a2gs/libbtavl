@@ -7,8 +7,15 @@
 
 #define BTAVL_OK    (1)
 #define BTAVL_ERROR (0)
+
 #define BTAVL_TRUE  (1)
 #define BTAVL_FALSE (0)
+
+typedef enum{
+	btavlComp_Left = 1,
+	btavlComp_Right,
+	btavlComp_Equal
+}btavlComp_t;
 
 typedef struct _btavlNode_t{
 	void *data;
@@ -21,10 +28,10 @@ typedef struct _btavlNode_t{
 }btavlNode_t;
 
 typedef struct _btavl_t{
-	int   (*defaultCompare)    (void *a, void *b);
-	void  (*defaultDeallocator)(void *data);
-	void *(*defaultAllocator)  (size_t size);
-	btavlNode_t *head;
+	btavlComp_t   (*defaultCompare)    (void *a, void *b);
+	void          (*defaultDeallocator)(void *data);
+	void         *(*defaultAllocator)  (size_t size);
+	btavlNode_t  *head;
 	unsigned long n;
 
 #ifdef BTAVL_TRANSVERSAL
@@ -33,10 +40,10 @@ typedef struct _btavl_t{
 }btavl_t;
 
 float btavlGetSize(btavl_t *ctx);
-void * btavlSearch(btavl_t *ctx, void *data, int (*compare)(void *a, void *b));
-int btavlDelete(btavl_t *ctx, void *data, int (*compare)(void *a, void *b), int callDataDealloc);
-int btavlInsert(btavl_t *ctx, void *data, int (*compare)(void *a, void *b));
-int btavlInit(btavl_t *ctx, int (*compare) (void *a, void *b), void *(*alloc) (size_t size), void (*dealloc) (void *data));
+void * btavlSearch(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *b));
+int btavlDelete(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *b), int callDataDealloc);
+int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *b));
+int btavlInit(btavl_t *ctx, btavlComp_t (*compare) (void *a, void *b), void *(*alloc) (size_t size), void (*dealloc) (void *data));
 
 #ifdef BTAVL_TRANSVERSAL
 typedef struct _btavlFetch_t{

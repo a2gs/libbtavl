@@ -12,15 +12,15 @@ typedef struct _sample_t{
 }sample_t;
 
 /*
- * a < b  -> -1
- * 1 = b  -> 0
- * a > b  -> 1
+ * a < b  -> LEFT
+ * 1 = b  -> EQUAL
+ * a > b  -> RIGHT
  */
-int dataSampleCompare(void *a, void *b)
+btavlComp_t dataSampleCompare(void *a, void *b)
 {
-	if     (((sample_t *)a)->x > ((sample_t *)b)->x) return(-1);
-	else if(((sample_t *)a)->x < ((sample_t *)b)->x) return(1);
-	return(0);
+	if     (((sample_t *)a)->x > ((sample_t *)b)->x) return(btavlComp_Left);
+	else if(((sample_t *)a)->x < ((sample_t *)b)->x) return(btavlComp_Right);
+	return(btavlComp_Equal);
 }
 
 int main(int argc, char *argv[])

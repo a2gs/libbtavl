@@ -11,7 +11,7 @@
 
 #define BTAVL_SETCOMPARATOR(__btavl_ctx_,                                                                                                 \
                             __btavl_comp_,                                                                                                \
-                            __btavl_compParam_) int (*__btavl_comp_)(void *a, void *b);                                                   \
+                            __btavl_compParam_) btavlComp_t (*__btavl_comp_)(void *a, void *b);                                           \
                                                 {                                                                                         \
                                                 	if(__btavl_ctx_->defaultCompare == NULL) __btavl_comp_ = __btavl_compParam_;           \
                                                 	else                                     __btavl_comp_ = __btavl_ctx_->defaultCompare; \
@@ -65,7 +65,7 @@ btavlNode_t ** btavlGetFather(btavl_t *ctx, btavlNode_t *n)
 	return(btavlIsHead(n) == BTAVL_TRUE ? &(ctx->head) : &(n->father->father));
 }
 
-int btavlSLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Simple Left Rotation */
+inline int btavlSLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Simple Left Rotation */
 {
 	*top = b;
 	a->b = b->a;
@@ -75,7 +75,7 @@ int btavlSLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) 
 	return(BTAVL_TRUE);
 }
 
-int btavlSRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Simple Right Rotation */
+inline int btavlSRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Simple Right Rotation */
 {
 	*top = b;
 	a->b = b->b;
@@ -85,7 +85,7 @@ int btavlSRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) 
 	return(BTAVL_TRUE);
 }
 
-int btavlDLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Double Left Rotation */
+inline int btavlDLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Double Left Rotation */
 {
 	*top = c;
 	a->b = c->a;
@@ -96,7 +96,7 @@ int btavlDLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) 
 	return(BTAVL_TRUE);
 }
 
-int btavlDRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Double Right Rotation */
+inline int btavlDRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Double Right Rotation */
 {
 	*top = c;
 	a->a = c->b;
@@ -107,7 +107,7 @@ int btavlDRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) 
 	return(BTAVL_TRUE);
 }
 
-void * btavlSearch(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
+void * btavlSearch(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *b))
 {
 	btavlNode_t *walker = NULL;
 	int compareResult   = 0;
@@ -119,10 +119,10 @@ void * btavlSearch(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 	for(walker = ctx->head, compareResult = 0; ; ){
 		compareResult = comp(data, walker);
 
-		if     (compareResult == -1) walker = walker->a;
-		else if(compareResult ==  1) walker = walker->b;
-		else if(compareResult ==  0) break;
-		else                         return(NULL);
+		if     (compareResult == btavlComp_Left)  walker = walker->a;
+		else if(compareResult == btavlComp_Right) walker = walker->b;
+		else if(compareResult == btavlComp_Equal) break;
+		else                                      return(NULL);
 	}
 
 	return(walker->data);
@@ -145,7 +145,7 @@ void * btavl_FetchTranversal(btavlFetch_t *f)
 }
 #endif
 
-int btavlDelete(btavl_t *ctx, void *data, int (*compare)(void *a, void *b), int callDataDealloc)
+int btavlDelete(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *b), int callDataDealloc)
 {
 	/*BTAVL_SETCOMPARATOR(ctx, comp, compare);*/
 
@@ -156,7 +156,7 @@ int btavlDelete(btavl_t *ctx, void *data, int (*compare)(void *a, void *b), int 
 	return(BTAVL_ERROR);
 }
 
-int btavlInsert(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
+int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *b))
 {
 	btavlNode_t *ins    = NULL;
 	btavlNode_t *walker = NULL;
@@ -188,7 +188,7 @@ int btavlInsert(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 
 		compareResult = comp(data, walker->data);
 
-		if(compareResult == -1){
+		if(compareResult == btavlComp_Left){
 
 			if(walker->a == NULL){
 				/* insert here */
@@ -215,7 +215,7 @@ int btavlInsert(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 				continue;
 			}
 
-		}else if(compareResult ==  1){
+		}else if(compareResult ==  btavlComp_Right){
 
 			if(walker->b == NULL){
 				/* insert here */
@@ -242,7 +242,7 @@ int btavlInsert(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 				continue;
 			}
 
-		}else if(compareResult ==  0)
+		}else if(compareResult ==  btavlComp_Equal)
 			return(BTAVL_ERROR); /* already exists */
 		else
 			return(BTAVL_ERROR);
@@ -256,10 +256,10 @@ int btavlInsert(btavl_t *ctx, void *data, int (*compare)(void *a, void *b))
 	return(BTAVL_ERROR);
 }
 
-int btavlInit(btavl_t *ctx,
-              int   (*compare) (void *a, void *b),
-              void *(*alloc)   (size_t size),
-              void  (*dealloc) (void *data))
+int btavlInit(btavl_t    *ctx,
+              btavlComp_t (*compare) (void *a, void *b),
+              void       *(*alloc)   (size_t size),
+              void        (*dealloc) (void *data))
 {
 	ctx->n                  = 0;
 	ctx->head               = NULL;
