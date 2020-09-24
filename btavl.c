@@ -22,14 +22,14 @@
                        __btavl_a_,      \
                        __btavl_b_,      \
                        __btavl_father_, \
-                       __btavl_h,       \
+                       __btavl_h_,      \
                        __btavl_data_,   \
                        __btavl_prev_,   \
                        __btavl_next_) { \
-                                      	__btavl_node_->a = __btavl_a_;           \
-                                      	__btavl_node_->b = __btavl_b_;           \
+                                      	__btavl_node_->a      = __btavl_a_;      \
+                                      	__btavl_node_->b      = __btavl_b_;      \
                                       	__btavl_node_->father = __btavl_father_; \
-                                      	__btavl_node_->h      = __btavl_h;       \
+                                      	__btavl_node_->h      = __btavl_h_;      \
                                       	__btavl_node_->data   = __btavl_data_;   \
                                       	__btavl_node_->prev   = __btavl_prev_;   \
                                       	__btavl_node_->next   = __btavl_next_;   \
@@ -39,12 +39,12 @@
                        __btavl_a_,      \
                        __btavl_b_,      \
                        __btavl_father_, \
-                       __btavl_h,       \
+                       __btavl_h_,      \
                        __btavl_data_) { \
-                                      	__btavl_node_->a = __btavl_a_;           \
-                                      	__btavl_node_->b = __btavl_b_;           \
+                                      	__btavl_node_->a      = __btavl_a_;      \
+                                      	__btavl_node_->b      = __btavl_b_;      \
                                       	__btavl_node_->father = __btavl_father_; \
-                                      	__btavl_node_->h      = __btavl_h;       \
+                                      	__btavl_node_->h      = __btavl_h_;      \
                                       	__btavl_node_->data   = __btavl_data_;   \
                                       }
 #endif
@@ -68,9 +68,9 @@ btavlNode_t ** btavlGetFather(btavl_t *ctx, btavlNode_t *n)
 int btavlSLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Simple Left Rotation */
 {
 	*top = b;
+	a->b = b->a;
 	b->a = a;
 	b->b = c;
-	a->a = a->b = c->a = c->b = NULL;
 
 	return(BTAVL_TRUE);
 }
@@ -78,9 +78,9 @@ int btavlSLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) 
 int btavlSRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Simple Right Rotation */
 {
 	*top = b;
+	a->b = b->b;
 	b->a = c;
 	b->b = a;
-	a->a = a->b = c->a = c->b = NULL;
 
 	return(BTAVL_TRUE);
 }
@@ -88,9 +88,10 @@ int btavlSRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) 
 int btavlDLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Double Left Rotation */
 {
 	*top = c;
+	a->b = c->a;
+	b->a = c->b;
 	c->a = a;
 	c->b = b;
-	a->a = a->b = b->a = b->b = NULL;
 
 	return(BTAVL_TRUE);
 }
@@ -98,9 +99,10 @@ int btavlDLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) 
 int btavlDRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Double Right Rotation */
 {
 	*top = c;
+	a->a = c->b;
+	b->b = c->a;
 	c->a = b;
 	c->b = a;
-	a->a = a->b = b->a = b->b = NULL;
 
 	return(BTAVL_TRUE);
 }
