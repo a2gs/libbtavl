@@ -54,18 +54,18 @@ float btavlGetSize(btavl_t *ctx)
 	return(((log(2.236068 * (ctx->n + 2))) / log(1.618034)) - 2);
 }
 
-inline int btavlIsHead(btavlNode_t *n)
+inline static int btavlIsHead(btavlNode_t *n)
 {
 	/* or: return(n->h == 0 ? BTAVL_TRUE : BTAVL_FALSE); */
 	return(n->father == NULL ? BTAVL_TRUE : BTAVL_FALSE);
 }
 
-inline btavlNode_t ** btavlGetFather(btavl_t *ctx, btavlNode_t *n)
+inline static btavlNode_t ** btavlGetFather(btavl_t *ctx, btavlNode_t *n)
 {
 	return(btavlIsHead(n) == BTAVL_TRUE ? &(ctx->head) : &(n->father->father));
 }
 
-inline int btavlSLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Simple Left Rotation */
+inline static int btavlSLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Simple Left Rotation */
 {
 	*top = b;
 	a->b = b->a;
@@ -75,7 +75,7 @@ inline int btavlSLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode
 	return(BTAVL_TRUE);
 }
 
-inline int btavlSRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Simple Right Rotation */
+inline static int btavlSRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Simple Right Rotation */
 {
 	*top = b;
 	a->b = b->b;
@@ -85,7 +85,7 @@ inline int btavlSRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode
 	return(BTAVL_TRUE);
 }
 
-inline int btavlDLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Double Left Rotation */
+inline static int btavlDLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Double Left Rotation */
 {
 	*top = c;
 	a->b = c->a;
@@ -96,7 +96,7 @@ inline int btavlDLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode
 	return(BTAVL_TRUE);
 }
 
-inline int btavlDRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Double Right Rotation */
+inline static int btavlDRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Double Right Rotation */
 {
 	*top = c;
 	a->a = c->b;
@@ -148,6 +148,26 @@ void * btavlFetchTranversal(btavlFetch_t *f)
 	return(data);
 }
 #endif
+
+#define BTAVL_MODE_INSERT (1)
+#define BTAVL_MODE_DELETE (2)
+
+int btavlRebalance(btavl_t *ctx, btavlNode_t *node, int mode)
+{
+	btavlNode_t **god     = NULL;
+	btavlNode_t  *father  = NULL;
+	btavlNode_t  *element = NULL;
+
+	god     = btavlGetFather(ctx, node->father);
+	father  = node->father;
+	element = node;
+
+	if(mode == BTAVL_MODE_INSERT){
+	}else if(mode == BTAVL_MODE_DELETE){
+	}else return(BTAVL_ERROR);
+
+	return(BTAVL_OK);
+}
 
 int btavlDelete(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *b), int callDataDealloc)
 {
@@ -244,6 +264,8 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 	ctx->n++;
 	ctx->end->next = ins;
 	ctx->end = ins;
+
+	btavlRebalance(ctx, ins, BTAVL_MODE_INSERT);
 
 	return(BTAVL_OK);
 }
