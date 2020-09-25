@@ -153,7 +153,7 @@ inline static int btavlHeight(btavl_t *ctx, btavlNode_t *node)
 {
 	btavlNode_t *backtrack = NULL;
 
-	for(backtrack = node; ; backtrack = backtrack->father){
+	for(backtrack = node; backtrack != NULL; backtrack = backtrack->father){
 		if(backtrack->h > backtrack->father->h) break;
 		backtrack->h++;
 	}
