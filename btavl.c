@@ -149,10 +149,22 @@ void * btavlFetchTranversal(btavlFetch_t *f)
 }
 #endif
 
+inline static int btavlHeight(btavl_t *ctx, btavlNode_t *node)
+{
+	btavlNode_t *backtrack = NULL;
+
+	for(backtrack = node; ; backtrack = backtrack->father){
+		if(backtrack->h > backtrack->father->h) break;
+		backtrack->h++;
+	}
+
+	return(BTAVL_OK);
+}
+
 #define BTAVL_MODE_INSERT (1)
 #define BTAVL_MODE_DELETE (2)
 
-int btavlRebalance(btavl_t *ctx, btavlNode_t *node, int mode)
+int btavlBalance(btavl_t *ctx, btavlNode_t *node, int mode)
 {
 	btavlNode_t **god     = NULL;
 	btavlNode_t  *father  = NULL;
@@ -265,7 +277,9 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 	ctx->end->next = ins;
 	ctx->end = ins;
 
-	btavlRebalance(ctx, ins, BTAVL_MODE_INSERT);
+	btavlHeight(ctx, ins);
+
+	btavlBalance(ctx, ins, BTAVL_MODE_INSERT);
 
 	return(BTAVL_OK);
 }
