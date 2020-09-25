@@ -54,13 +54,13 @@ float btavlGetSize(btavl_t *ctx)
 	return(((log(2.236068 * (ctx->n + 2))) / log(1.618034)) - 2);
 }
 
-int btavlIsHead(btavlNode_t *n)
+inline int btavlIsHead(btavlNode_t *n)
 {
 	/* or: return(n->h == 0 ? BTAVL_TRUE : BTAVL_FALSE); */
 	return(n->father == NULL ? BTAVL_TRUE : BTAVL_FALSE);
 }
 
-btavlNode_t ** btavlGetFather(btavl_t *ctx, btavlNode_t *n)
+inline btavlNode_t ** btavlGetFather(btavl_t *ctx, btavlNode_t *n)
 {
 	return(btavlIsHead(n) == BTAVL_TRUE ? &(ctx->head) : &(n->father->father));
 }
@@ -129,19 +129,23 @@ void * btavlSearch(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, voi
 }
 
 #ifdef BTAVL_TRANSVERSAL
-void * btavl_InitTranversal(btavl_t *ctx, btavlFetch_t *f)
+int btavlInitTranversal(btavl_t *ctx, btavlFetch_t *f)
 {
 	f->walker = ctx->head;
-	return(f->walker->data);
+	return(BTAVL_OK);
 }
 
-void * btavl_FetchTranversal(btavlFetch_t *f)
+void * btavlFetchTranversal(btavlFetch_t *f)
 {
+	void *data = NULL;
+
 	if(f->walker == NULL)
 		return(NULL);
 
+	data = f->walker->data;
 	f->walker = f->walker->next;
-	return(f->walker->data);
+
+	return(data);
 }
 #endif
 
@@ -150,8 +154,6 @@ int btavlDelete(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 	/*BTAVL_SETCOMPARATOR(ctx, comp, compare);*/
 
 	ctx->n--;
-
-
 
 	return(BTAVL_ERROR);
 }
@@ -165,14 +167,15 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 
 	BTAVL_SETCOMPARATOR(ctx, comp, compare);
 
+	ins = ctx->defaultAllocator(sizeof(btavlNode_t));
+	if(ins == NULL){
+		return(BTAVL_ERROR);
+	}
+
 	if(ctx->head == NULL){
-		ins = ctx->defaultAllocator(sizeof(btavlNode_t));
-		if(ins == NULL){
-			return(BTAVL_ERROR);
-		}
 
 #ifdef BTAVL_TRANSVERSAL
-		BTAVL_FILLNODE(ins, NULL, NULL, NULL, 0, data, ctx->end, NULL);
+		BTAVL_FILLNODE(ins, NULL, NULL, NULL, 0, data, NULL, NULL);
 		ctx->end = ins;
 #else
 		BTAVL_FILLNODE(ins, NULL, NULL, NULL, 0, data);
@@ -193,67 +196,56 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 			if(walker->a == NULL){
 				/* insert here */
 
-				ins = ctx->defaultAllocator(sizeof(btavlNode_t));
-				if(ins == NULL){
-					return(BTAVL_ERROR);
-				}
-
 #ifdef BTAVL_TRANSVERSAL
-				BTAVL_FILLNODE(ins, NULL, NULL, walker, 0, data, ctx->end, NULL);
+				BTAVL_FILLNODE(ins, NULL, NULL, walker, h, data, ctx->end, NULL);
 #else
-				BTAVL_FILLNODE(ins, NULL, NULL, walker, 0, data);
+				BTAVL_FILLNODE(ins, NULL, NULL, walker, h, data);
 #endif
 
 				walker->a = ins;
 
-
-
-				ctx->n++;
+				break;
 
 			}else{
 				walker = walker->a;
 				continue;
 			}
 
-		}else if(compareResult ==  btavlComp_Right){
+		}else if(compareResult == btavlComp_Right){
 
 			if(walker->b == NULL){
 				/* insert here */
 
-				ins = ctx->defaultAllocator(sizeof(btavlNode_t));
-				if(ins == NULL){
-					return(BTAVL_ERROR);
-				}
-
 #ifdef BTAVL_TRANSVERSAL
-				BTAVL_FILLNODE(ins, NULL, NULL, walker, 0, data, ctx->end, NULL);
+				BTAVL_FILLNODE(ins, NULL, NULL, walker, h, data, ctx->end, NULL);
 #else
-				BTAVL_FILLNODE(ins, NULL, NULL, walker, 0, data);
+				BTAVL_FILLNODE(ins, NULL, NULL, walker, h, data);
 #endif
 
 				walker->b = ins;
 
-
-
-				ctx->n++;
+				break;
 
 			}else{
 				walker = walker->b;
 				continue;
 			}
 
-		}else if(compareResult ==  btavlComp_Equal)
-			return(BTAVL_ERROR); /* already exists */
-		else
+		}else if(compareResult == btavlComp_Equal){
+			/* already exists */
+			ctx->defaultDeallocator(ins);
 			return(BTAVL_ERROR);
-
+		}else{
+			ctx->defaultDeallocator(ins);
+			return(BTAVL_ERROR);
+		}
 	}
 
+	ctx->n++;
+	ctx->end->next = ins;
+	ctx->end = ins;
 
-
-
-
-	return(BTAVL_ERROR);
+	return(BTAVL_OK);
 }
 
 int btavlInit(btavl_t    *ctx,

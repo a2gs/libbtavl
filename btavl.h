@@ -31,11 +31,11 @@ typedef struct _btavl_t{
 	btavlComp_t   (*defaultCompare)    (void *a, void *b);
 	void          (*defaultDeallocator)(void *data);
 	void         *(*defaultAllocator)  (size_t size);
-	btavlNode_t  *head;
 	unsigned long n;
+	btavlNode_t  *head;
 
 #ifdef BTAVL_TRANSVERSAL
-	struct _btavlNode_t *end;
+	btavlNode_t *end;
 #endif
 }btavl_t;
 
@@ -50,8 +50,8 @@ typedef struct _btavlFetch_t{
 	btavlNode_t *walker;
 }btavlFetch_t;
 
-void * btavl_InitTranversal(btavl_t *ctx, btavlFetch_t *f);
-void * btavl_FetchTranversal(btavlFetch_t *f);
+int btavlInitTranversal(btavl_t *ctx, btavlFetch_t *f);
+void * btavlFetchTranversal(btavlFetch_t *f);
 #endif
 
 #endif

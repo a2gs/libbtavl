@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 {
 	btavl_t ctx;
 #ifdef BTAVL_TRANSVERSAL
-	btavlFetch_t *fetch = NULL;
+	btavlFetch_t fetch;
 	sample_t *dataFetch = NULL;
 #endif
 
@@ -54,8 +54,11 @@ int main(int argc, char *argv[])
 		printf("Search: [%s]\n", dataSearch->y);
 
 #ifdef BTAVL_TRANSVERSAL
-	for(btavl_InitTranversal(&ctx, fetch); fetch != NULL; dataFetch = btavl_FetchTranversal(fetch)){
-		printf("Data x: [%d] | y: [%s]\n", dataFetch->x, dataFetch->y);
+	if(btavlInitTranversal(&ctx, &fetch) != BTAVL_OK){
+	}
+
+	for(dataFetch = btavlFetchTranversal(&fetch); dataFetch != NULL; dataFetch = btavlFetchTranversal(&fetch)){
+		printf("Key: [%d] | Value: [%s]\n", dataFetch->x, dataFetch->y);
 	}
 #endif
 
