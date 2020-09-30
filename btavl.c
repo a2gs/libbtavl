@@ -149,14 +149,22 @@ void * btavlFetchTranversal(btavlFetch_t *f)
 }
 #endif
 
+inline static int btavlBalanceFactor(btavlNode_t *node)
+{
+	unsigned int ah = (node->a == NULL ? 0 : node->a->h);
+	unsigned int bh = (node->b == NULL ? 0 : node->b->h);
+
+	return(ah - bh);
+}
+
 inline static int btavlHeight(btavl_t *ctx, btavlNode_t *node)
 {
 	btavlNode_t *backtrack = NULL;
 
-	for(backtrack = node; backtrack != NULL; backtrack = backtrack->father){
-		if(backtrack->h > backtrack->father->h) break;
+	for(backtrack = node;
+	    (backtrack->h <= backtrack->father->h) && (backtrack != NULL);
+	    backtrack = backtrack->father)
 		backtrack->h++;
-	}
 
 	return(BTAVL_OK);
 }
@@ -195,7 +203,6 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 	btavlNode_t *ins    = NULL;
 	btavlNode_t *walker = NULL;
 	int compareResult   = 0;
-	unsigned int h      = 0;
 
 	BTAVL_SETCOMPARATOR(ctx, comp, compare);
 
@@ -207,10 +214,10 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 	if(ctx->head == NULL){
 
 #ifdef BTAVL_TRANSVERSAL
-		BTAVL_FILLNODE(ins, NULL, NULL, NULL, 0, data, NULL, NULL);
+		BTAVL_FILLNODE(ins, NULL, NULL, NULL, 1, data, NULL, NULL);
 		ctx->end = ins;
 #else
-		BTAVL_FILLNODE(ins, NULL, NULL, NULL, 0, data);
+		BTAVL_FILLNODE(ins, NULL, NULL, NULL, 1, data);
 #endif
 
 		ctx->head = ins;
@@ -219,7 +226,7 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 		return(BTAVL_OK);
 	}
 
-	for(walker = ctx->head, h = 1; ; h++){
+	for(walker = ctx->head; ; ){
 
 		compareResult = comp(data, walker->data);
 
@@ -229,9 +236,9 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 				/* insert here */
 
 #ifdef BTAVL_TRANSVERSAL
-				BTAVL_FILLNODE(ins, NULL, NULL, walker, h, data, ctx->end, NULL);
+				BTAVL_FILLNODE(ins, NULL, NULL, walker, 1, data, ctx->end, NULL);
 #else
-				BTAVL_FILLNODE(ins, NULL, NULL, walker, h, data);
+				BTAVL_FILLNODE(ins, NULL, NULL, walker, 1, data);
 #endif
 
 				walker->a = ins;
@@ -249,9 +256,9 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 				/* insert here */
 
 #ifdef BTAVL_TRANSVERSAL
-				BTAVL_FILLNODE(ins, NULL, NULL, walker, h, data, ctx->end, NULL);
+				BTAVL_FILLNODE(ins, NULL, NULL, walker, 1, data, ctx->end, NULL);
 #else
-				BTAVL_FILLNODE(ins, NULL, NULL, walker, h, data);
+				BTAVL_FILLNODE(ins, NULL, NULL, walker, 1, data);
 #endif
 
 				walker->b = ins;
