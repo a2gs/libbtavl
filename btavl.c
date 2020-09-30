@@ -65,12 +65,22 @@ inline static btavlNode_t ** btavlGetFather(btavl_t *ctx, btavlNode_t *n)
 	return(btavlIsHead(n) == BTAVL_TRUE ? &(ctx->head) : &(n->father->father));
 }
 
+inline static unsigned int btavlRebalanceToHighest(btavlNode_t *node)
+{
+	node->h = ((node->a->h > node->b->h) ? (node->a->h + 1) : (node->b->h + 1));
+	return(node->h);
+}
+
 inline static int btavlSLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Simple Left Rotation */
 {
 	*top = b;
 	a->b = b->a;
 	b->a = a;
 	b->b = c;
+
+	btavlRebalanceToHighest(a);
+	btavlRebalanceToHighest(b);
+	btavlRebalanceToHighest(c);
 
 	return(BTAVL_TRUE);
 }
@@ -81,6 +91,10 @@ inline static int btavlSRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, bt
 	a->b = b->b;
 	b->a = c;
 	b->b = a;
+
+	btavlRebalanceToHighest(a);
+	btavlRebalanceToHighest(b);
+	btavlRebalanceToHighest(c);
 
 	return(BTAVL_TRUE);
 }
@@ -93,6 +107,10 @@ inline static int btavlDLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, bt
 	c->a = a;
 	c->b = b;
 
+	btavlRebalanceToHighest(a);
+	btavlRebalanceToHighest(b);
+	btavlRebalanceToHighest(c);
+
 	return(BTAVL_TRUE);
 }
 
@@ -103,6 +121,10 @@ inline static int btavlDRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, bt
 	b->b = c->a;
 	c->a = b;
 	c->b = a;
+
+	btavlRebalanceToHighest(a);
+	btavlRebalanceToHighest(b);
+	btavlRebalanceToHighest(c);
 
 	return(BTAVL_TRUE);
 }
