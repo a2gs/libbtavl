@@ -49,6 +49,27 @@
                                       }
 #endif
 
+#ifdef BTAVL_DEBUG
+int btavlStupidDebug(btavl_t *ctx, char * (*printData)(void *data))
+{
+	btavlNode_t *walker = NULL;
+	unsigned int i = 0;
+
+	for(i = ctx->head->h; i > 0; i--){
+		printf("%02d: ", i);
+
+		for(walker = ctx->start; ; walker = walker->next){
+			if(walker->h == i){
+				printf("[%s|F: %p|a: %p|b: %p]", printData(walker->data), walker->father, walker->a, walker->b);
+			}
+		}
+		printf("\n\n");
+	}
+
+	return(BTAVL_OK);
+}
+#endif
+
 float btavlGetSize(btavl_t *ctx)
 {
 	return(((log(2.236068 * (ctx->n + 2))) / log(1.618034)) - 2);
@@ -67,7 +88,7 @@ inline static btavlNode_t ** btavlGetFather(btavl_t *ctx, btavlNode_t *n)
 
 inline static unsigned int btavlRebalanceToHighest(btavlNode_t *node)
 {
-	node->h = ((node->a->h > node->b->h) ? (node->a->h + 1) : (node->b->h + 1));
+	node->h = (node->a->h > node->b->h ? node->a->h : node->b->h) + 1;
 	return(node->h);
 }
 
@@ -151,13 +172,13 @@ void * btavlSearch(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, voi
 }
 
 #ifdef BTAVL_TRANSVERSAL
-int btavlInitTranversal(btavl_t *ctx, btavlFetch_t *f)
+int btavlInitTransversal(btavl_t *ctx, btavlFetch_t *f)
 {
-	f->walker = ctx->head;
+	f->walker = ctx->start;
 	return(BTAVL_OK);
 }
 
-void * btavlFetchTranversal(btavlFetch_t *f)
+void * btavlFetchTransversal(btavlFetch_t *f)
 {
 	void *data = NULL;
 
@@ -225,6 +246,7 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 	btavlNode_t *ins    = NULL;
 	btavlNode_t *walker = NULL;
 	int compareResult   = 0;
+	unsigned int i      = 0;
 
 	BTAVL_SETCOMPARATOR(ctx, comp, compare);
 
@@ -237,7 +259,8 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 
 #ifdef BTAVL_TRANSVERSAL
 		BTAVL_FILLNODE(ins, NULL, NULL, NULL, 1, data, NULL, NULL);
-		ctx->end = ins;
+		ctx->start = ins;
+		ctx->end   = ins;
 #else
 		BTAVL_FILLNODE(ins, NULL, NULL, NULL, 1, data);
 #endif
@@ -248,7 +271,10 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 		return(BTAVL_OK);
 	}
 
-	for(walker = ctx->head; ; ){
+	for(walker = ctx->head, i = 0; ; i++){
+
+		if(i > 2){
+		}
 
 		compareResult = comp(data, walker->data);
 

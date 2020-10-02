@@ -35,7 +35,7 @@ typedef struct _btavl_t{
 	btavlNode_t  *head;
 
 #ifdef BTAVL_TRANSVERSAL
-	btavlNode_t *end;
+	btavlNode_t *start, *end;
 #endif
 }btavl_t;
 
@@ -50,8 +50,12 @@ typedef struct _btavlFetch_t{
 	btavlNode_t *walker;
 }btavlFetch_t;
 
-int btavlInitTranversal(btavl_t *ctx, btavlFetch_t *f);
-void * btavlFetchTranversal(btavlFetch_t *f);
+int btavlInitTransversal(btavl_t *ctx, btavlFetch_t *f);
+void * btavlFetchTransversal(btavlFetch_t *f);
+#endif
+
+#ifdef BTAVL_DEBUG
+int btavlStupidDebug(btavl_t *ctx, char * (*printData)(void *data));
 #endif
 
 #endif

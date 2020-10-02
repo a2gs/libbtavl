@@ -23,6 +23,14 @@ btavlComp_t dataSampleCompare(void *a, void *b)
 	return(btavlComp_Equal);
 }
 
+#ifdef BTAVL_DEBUG
+char * printData(void *data)
+{
+	sample_t *d = (sample_t *)data;
+	return(d->y);
+}
+#endif
+
 int main(int argc, char *argv[])
 {
 	btavl_t ctx;
@@ -44,6 +52,10 @@ int main(int argc, char *argv[])
 	btavlInsert(&ctx, &data7 , NULL); btavlInsert(&ctx, &data8 , NULL); btavlInsert(&ctx, &data9, NULL);
 	btavlInsert(&ctx, &data10, NULL); btavlInsert(&ctx, &data11, NULL);
 
+#ifdef BTAVL_DEBUG
+	btavlStupidDebug(&ctx, printData);
+#endif
+
 	btavlDelete(&ctx, &data4, NULL, BTAVL_FALSE);
 	btavlDelete(&ctx, &data9, NULL, BTAVL_FALSE);
 	btavlDelete(&ctx, &data1, NULL, BTAVL_FALSE);
@@ -54,10 +66,10 @@ int main(int argc, char *argv[])
 		printf("Search: [%s]\n", dataSearch->y);
 
 #ifdef BTAVL_TRANSVERSAL
-	if(btavlInitTranversal(&ctx, &fetch) != BTAVL_OK){
+	if(btavlInitTransversal(&ctx, &fetch) != BTAVL_OK){
 	}
 
-	for(dataFetch = btavlFetchTranversal(&fetch); dataFetch != NULL; dataFetch = btavlFetchTranversal(&fetch)){
+	for(dataFetch = btavlFetchTransversal(&fetch); dataFetch != NULL; dataFetch = btavlFetchTransversal(&fetch)){
 		printf("Key: [%d] | Value: [%s]\n", dataFetch->x, dataFetch->y);
 	}
 #endif
