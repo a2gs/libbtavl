@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
 	btavlStupidDebug(&ctx, printData);
 #endif
 
+/*
 	btavlDelete(&ctx, &data4, NULL, BTAVL_FALSE);
 	btavlDelete(&ctx, &data9, NULL, BTAVL_FALSE);
 	btavlDelete(&ctx, &data1, NULL, BTAVL_FALSE);
@@ -64,6 +65,7 @@ int main(int argc, char *argv[])
 
 	if(dataSearch != NULL)
 		printf("Search: [%s]\n", dataSearch->y);
+*/
 
 #ifdef BTAVL_TRANSVERSAL
 	if(btavlInitTransversal(&ctx, &fetch) != BTAVL_OK){

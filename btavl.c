@@ -58,7 +58,7 @@ int btavlStupidDebug(btavl_t *ctx, char * (*printData)(void *data))
 	for(i = ctx->head->h; i > 0; i--){
 		printf("%02d: ", i);
 
-		for(walker = ctx->start; ; walker = walker->next){
+		for(walker = ctx->start; walker != NULL; walker = walker->next){
 			if(walker->h == i){
 				printf("[%s|F: %p|a: %p|b: %p]", printData(walker->data), walker->father, walker->a, walker->b);
 			}
@@ -77,7 +77,6 @@ float btavlGetSize(btavl_t *ctx)
 
 inline static int btavlIsHead(btavlNode_t *n)
 {
-	/* or: return(n->h == 0 ? BTAVL_TRUE : BTAVL_FALSE); */
 	return(n->father == NULL ? BTAVL_TRUE : BTAVL_FALSE);
 }
 
@@ -99,6 +98,10 @@ inline static int btavlSLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, bt
 	b->a = a;
 	b->b = c;
 
+	b->father = a->father;
+	a->father = b;
+	c->father = b;
+
 	btavlRebalanceToHighest(a);
 	btavlRebalanceToHighest(b);
 	btavlRebalanceToHighest(c);
@@ -112,6 +115,10 @@ inline static int btavlSRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, bt
 	a->b = b->b;
 	b->a = c;
 	b->b = a;
+
+	b->father = a->father;
+	a->father = b;
+	c->father = b;
 
 	btavlRebalanceToHighest(a);
 	btavlRebalanceToHighest(b);
@@ -128,6 +135,10 @@ inline static int btavlDLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, bt
 	c->a = a;
 	c->b = b;
 
+	c->father = a->father;
+	a->father = c;
+	b->father = c;
+
 	btavlRebalanceToHighest(a);
 	btavlRebalanceToHighest(b);
 	btavlRebalanceToHighest(c);
@@ -142,6 +153,10 @@ inline static int btavlDRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, bt
 	b->b = c->a;
 	c->a = b;
 	c->b = a;
+
+	c->father = a->father;
+	a->father = c;
+	b->father = c;
 
 	btavlRebalanceToHighest(a);
 	btavlRebalanceToHighest(b);
@@ -200,14 +215,15 @@ inline static int btavlBalanceFactor(btavlNode_t *node)
 	return(ah - bh);
 }
 
-inline static int btavlHeight(btavl_t *ctx, btavlNode_t *node)
+inline static int btavlHeight(btavl_t *ctx, btavlNode_t *backtrack)
 {
-	btavlNode_t *backtrack = NULL;
+	for(; ; backtrack = backtrack->father){
 
-	for(backtrack = node;
-	    (backtrack->h <= backtrack->father->h) && (backtrack != NULL);
-	    backtrack = backtrack->father)
 		backtrack->h++;
+
+		if(btavlIsHead(backtrack) == BTAVL_TRUE || backtrack->h < backtrack->father->h)
+			break;
+	}
 
 	return(BTAVL_OK);
 }
@@ -284,9 +300,9 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 				/* insert here */
 
 #ifdef BTAVL_TRANSVERSAL
-				BTAVL_FILLNODE(ins, NULL, NULL, walker, 1, data, ctx->end, NULL);
+				BTAVL_FILLNODE(ins, NULL, NULL, walker, 0, data, ctx->end, NULL);
 #else
-				BTAVL_FILLNODE(ins, NULL, NULL, walker, 1, data);
+				BTAVL_FILLNODE(ins, NULL, NULL, walker, 0, data);
 #endif
 
 				walker->a = ins;
@@ -304,9 +320,9 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 				/* insert here */
 
 #ifdef BTAVL_TRANSVERSAL
-				BTAVL_FILLNODE(ins, NULL, NULL, walker, 1, data, ctx->end, NULL);
+				BTAVL_FILLNODE(ins, NULL, NULL, walker, 0, data, ctx->end, NULL);
 #else
-				BTAVL_FILLNODE(ins, NULL, NULL, walker, 1, data);
+				BTAVL_FILLNODE(ins, NULL, NULL, walker, 0, data);
 #endif
 
 				walker->b = ins;
@@ -334,7 +350,7 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 
 	btavlHeight(ctx, ins);
 
-	btavlBalance(ctx, ins, BTAVL_MODE_INSERT);
+//	btavlBalance(ctx, ins, BTAVL_MODE_INSERT);
 
 	return(BTAVL_OK);
 }
