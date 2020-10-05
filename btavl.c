@@ -367,7 +367,8 @@ int btavlInit(btavl_t    *ctx,
 	ctx->defaultDeallocator = dealloc;
 
 #ifdef BTAVL_TRANSVERSAL
-	ctx->end = NULL;
+	ctx->start = NULL;
+	ctx->end   = NULL;
 #endif
 
 	return(BTAVL_OK);
