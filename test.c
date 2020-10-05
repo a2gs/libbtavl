@@ -27,7 +27,7 @@ btavlComp_t dataSampleCompare(void *a, void *b)
 char * printData(void *data)
 {
 	sample_t *d = (sample_t *)data;
-	return(d->y);
+	return((d == NULL ? "NULL" : d->y));
 }
 #endif
 

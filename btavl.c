@@ -59,9 +59,12 @@ int btavlStupidDebug(btavl_t *ctx, char * (*printData)(void *data))
 		printf("%02d: ", i);
 
 		for(walker = ctx->start; walker != NULL; walker = walker->next){
-			if(walker->h == i){
-				printf("[%s|F: %p|a: %p|b: %p]", printData(walker->data), walker->father, walker->a, walker->b);
-			}
+			if(walker->h == i)
+				printf("[%s|F: %s|a: %s|b: %s] ",
+				       printData(walker->data),
+				       printData(walker->father == NULL ? NULL : walker->father->data),
+				       printData(walker->a == NULL ? NULL : walker->a->data),
+				       printData(walker->b == NULL ? NULL : walker->b->data));
 		}
 		printf("\n\n");
 	}
