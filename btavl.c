@@ -234,7 +234,15 @@ inline static int btavlHeight(btavl_t *ctx, btavlNode_t *backtrack)
 #define BTAVL_MODE_INSERT (1)
 #define BTAVL_MODE_DELETE (2)
 
-int btavlBalance(btavl_t *ctx, btavlNode_t *node, int mode)
+#define BTAVL_GETDIRECTION(__btavl_direction_)      (__btavl_direction_ & 0x03)
+#define BTAVL_SETDIRECTIONLEFT(__btavl_direction_)  (__btavl_direction_ <<= 0x01)
+#define BTAVL_SETDIRECTIONRIGHT(__btavl_direction_) (__btavl_direction_ = ((__btavl_direction_ << 0x01) | 0x01))
+#define BTAVL_LEFTLEFT   (0x00)
+#define BTAVL_LEFTRIGHT  (0x01)
+#define BTAVL_RIGHTLEFT  (0x02)
+#define BTAVL_RIGHTRIGHT (0x03)
+
+int btavlBalance(btavl_t *ctx, btavlNode_t *node, int direction, int mode)
 {
 	btavlNode_t **god     = NULL;
 	btavlNode_t  *father  = NULL;
@@ -245,6 +253,11 @@ int btavlBalance(btavl_t *ctx, btavlNode_t *node, int mode)
 	element = node;
 
 	if(mode == BTAVL_MODE_INSERT){
+		if(direction == BTAVL_LEFTLEFT){
+		}else if(direction == BTAVL_LEFTRIGHT){
+		}else if(direction == BTAVL_RIGHTLEFT){
+		}else if(direction == BTAVL_RIGHTRIGHT){
+		}
 	}else if(mode == BTAVL_MODE_DELETE){
 	}else return(BTAVL_ERROR);
 
@@ -265,6 +278,7 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 	btavlNode_t *ins    = NULL;
 	btavlNode_t *walker = NULL;
 	int compareResult   = 0;
+	unsigned int direction = 0;
 	unsigned int i      = 0;
 
 	BTAVL_SETCOMPARATOR(ctx, comp, compare);
@@ -290,7 +304,7 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 		return(BTAVL_OK);
 	}
 
-	for(walker = ctx->head, i = 0; ; i++){
+	for(walker = ctx->head, direction = 0x00, i = 0; ; i++){
 
 		if(i > 2){
 		}
@@ -298,6 +312,8 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 		compareResult = comp(data, walker->data);
 
 		if(compareResult == btavlComp_Left){
+
+			BTAVL_SETDIRECTIONLEFT(direction);
 
 			if(walker->a == NULL){
 				/* insert here */
@@ -318,6 +334,8 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 			}
 
 		}else if(compareResult == btavlComp_Right){
+
+			BTAVL_SETDIRECTIONRIGHT(direction);
 
 			if(walker->b == NULL){
 				/* insert here */
@@ -353,7 +371,7 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 
 	btavlHeight(ctx, ins);
 
-//	btavlBalance(ctx, ins, BTAVL_MODE_INSERT);
+	btavlBalance(ctx, ins, BTAVL_GETDIRECTION(direction), BTAVL_MODE_INSERT);
 
 	return(BTAVL_OK);
 }
