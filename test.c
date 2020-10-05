@@ -18,8 +18,8 @@ typedef struct _sample_t{
  */
 btavlComp_t dataSampleCompare(void *a, void *b)
 {
-	if     (((sample_t *)a)->x > ((sample_t *)b)->x) return(btavlComp_Left);
-	else if(((sample_t *)a)->x < ((sample_t *)b)->x) return(btavlComp_Right);
+	if     (((sample_t *)a)->x < ((sample_t *)b)->x) return(btavlComp_Left);
+	else if(((sample_t *)a)->x > ((sample_t *)b)->x) return(btavlComp_Right);
 	return(btavlComp_Equal);
 }
 
