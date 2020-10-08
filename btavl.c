@@ -110,10 +110,6 @@ inline static int btavlSLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, bt
 	a->father = b;
 	c->father = b;
 
-	btavlRebalanceToHighest(a);
-	btavlRebalanceToHighest(b);
-	btavlRebalanceToHighest(c);
-
 	return(BTAVL_TRUE);
 }
 
@@ -127,10 +123,6 @@ inline static int btavlSRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, bt
 	b->father = a->father;
 	a->father = b;
 	c->father = b;
-
-	btavlRebalanceToHighest(a);
-	btavlRebalanceToHighest(b);
-	btavlRebalanceToHighest(c);
 
 	return(BTAVL_TRUE);
 }
@@ -147,10 +139,6 @@ inline static int btavlDLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, bt
 	a->father = c;
 	b->father = c;
 
-	btavlRebalanceToHighest(a);
-	btavlRebalanceToHighest(b);
-	btavlRebalanceToHighest(c);
-
 	return(BTAVL_TRUE);
 }
 
@@ -165,10 +153,6 @@ inline static int btavlDRR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, bt
 	c->father = a->father;
 	a->father = c;
 	b->father = c;
-
-	btavlRebalanceToHighest(a);
-	btavlRebalanceToHighest(b);
-	btavlRebalanceToHighest(c);
 
 	return(BTAVL_TRUE);
 }
@@ -265,10 +249,16 @@ int btavlBalance(btavl_t *ctx, btavlNode_t *node, int direction, int mode)
 		return(BTAVL_OK);
 
 	if(mode == BTAVL_MODE_INSERT){
+
 		if     (direction == BTAVL_LEFTLEFT)   btavlSRR(god, grandfather, father, son); /* Simple Right Rotation */
 		else if(direction == BTAVL_LEFTRIGHT)  btavlDLR(god, grandfather, father, son); /* Double Left Rotation  */
 		else if(direction == BTAVL_RIGHTLEFT)  btavlDRR(god, grandfather, father, son); /* Double Right Rotation */
 		else if(direction == BTAVL_RIGHTRIGHT) btavlSLR(god, grandfather, father, son); /* Simple Left Rotation  */
+
+		btavlRebalanceToHighest(grandfather);
+		btavlRebalanceToHighest(father);
+		btavlRebalanceToHighest(son);
+
 	}else if(mode == BTAVL_MODE_DELETE){
 	}else return(BTAVL_ERROR);
 
