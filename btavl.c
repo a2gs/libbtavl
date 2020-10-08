@@ -83,8 +83,9 @@ inline static int btavlIsHead(btavlNode_t *n)
 	return(n->father == NULL ? BTAVL_TRUE : BTAVL_FALSE);
 }
 
-inline static btavlNode_t ** btavlGetFather(btavl_t *ctx, btavlNode_t *n)
+inline static btavlNode_t ** btavlGetGod(btavl_t *ctx, btavlNode_t *n)
 {
+	/* a safe function to get jesus christ father */
 	return(btavlIsHead(n) == BTAVL_TRUE ? &(ctx->head) : &(n->father->father));
 }
 
@@ -242,7 +243,7 @@ int btavlBalance(btavl_t *ctx, btavlNode_t *node, int direction, int mode)
 	grandfather = node->father->father;
 	father      = node->father;
 	son         = node;
-	god         = btavlGetFather(ctx, node->father);
+	god         = btavlGetGod(ctx, node->father);
 
 	h = btavlCalcBalanceFactorByHeight(grandfather);
 	if((h >= -1) && (h <= 1))
