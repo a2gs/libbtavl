@@ -49,7 +49,7 @@
                                       }
 #endif
 
-#ifdef BTAVL_DEBUG
+#if defined BTAVL_DEBUG && BTAVL_TRANSVERSAL
 int btavlStupidDebug(btavl_t *ctx, char * (*printData)(void *data))
 {
 	btavlNode_t *walker = NULL;
@@ -377,8 +377,10 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 	}
 
 	ctx->n++;
+#ifdef BTAVL_TRANSVERSAL
 	ctx->end->next = ins;
 	ctx->end = ins;
+#endif
 
 	btavlRecalcHeight(ctx, ins);
 

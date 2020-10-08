@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 	btavlInsert(&ctx, &data7 , NULL); btavlInsert(&ctx, &data8 , NULL); btavlInsert(&ctx, &data9, NULL);
 	btavlInsert(&ctx, &data10, NULL); btavlInsert(&ctx, &data11, NULL);
 
-#ifdef BTAVL_DEBUG
+#if defined BTAVL_DEBUG && BTAVL_TRANSVERSAL
 	btavlStupidDebug(&ctx, printData);
 #endif
 
