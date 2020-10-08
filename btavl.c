@@ -94,6 +94,11 @@ inline static unsigned int btavlRebalanceToHighest(btavlNode_t *node)
 	return(node->h);
 }
 
+inline static int btavlCalcBalanceFactorByHeight(btavlNode_t *node)
+{
+	return((node->a == NULL ? 0 : node->a->h) - (node->b == NULL ? 0 : node->b->h));
+}
+
 inline static int btavlSLR(btavlNode_t **top, btavlNode_t *a, btavlNode_t *b, btavlNode_t *c) /* Simple Left Rotation */
 {
 	*top = b;
@@ -218,7 +223,7 @@ inline static int btavlBalanceFactor(btavlNode_t *node)
 	return(ah - bh);
 }
 
-inline static int btavlHeight(btavl_t *ctx, btavlNode_t *backtrack)
+inline static int btavlRecalcHeight(btavl_t *ctx, btavlNode_t *backtrack)
 {
 	for(; ; backtrack = backtrack->father){
 
@@ -244,20 +249,26 @@ inline static int btavlHeight(btavl_t *ctx, btavlNode_t *backtrack)
 
 int btavlBalance(btavl_t *ctx, btavlNode_t *node, int direction, int mode)
 {
-	btavlNode_t **god     = NULL;
-	btavlNode_t  *father  = NULL;
-	btavlNode_t  *element = NULL;
+	int h = 0;
+	btavlNode_t **god         = NULL;
+	btavlNode_t  *grandfather = NULL;
+	btavlNode_t  *father      = NULL;
+	btavlNode_t  *son         = NULL;
 
-	god     = btavlGetFather(ctx, node->father);
-	father  = node->father;
-	element = node;
+	grandfather = node->father->father;
+	father      = node->father;
+	son         = node;
+	god         = btavlGetFather(ctx, node->father);
+
+	h = btavlCalcBalanceFactorByHeight(grandfather);
+	if((h >= -1) && (h <= 1))
+		return(BTAVL_OK);
 
 	if(mode == BTAVL_MODE_INSERT){
-		if(direction == BTAVL_LEFTLEFT){
-		}else if(direction == BTAVL_LEFTRIGHT){
-		}else if(direction == BTAVL_RIGHTLEFT){
-		}else if(direction == BTAVL_RIGHTRIGHT){
-		}
+		if     (direction == BTAVL_LEFTLEFT)   btavlSRR(god, grandfather, father, son); /* Simple Right Rotation */
+		else if(direction == BTAVL_LEFTRIGHT)  btavlDLR(god, grandfather, father, son); /* Double Left Rotation  */
+		else if(direction == BTAVL_RIGHTLEFT)  btavlDRR(god, grandfather, father, son); /* Double Right Rotation */
+		else if(direction == BTAVL_RIGHTRIGHT) btavlSLR(god, grandfather, father, son); /* Simple Left Rotation  */
 	}else if(mode == BTAVL_MODE_DELETE){
 	}else return(BTAVL_ERROR);
 
@@ -369,7 +380,7 @@ int btavlInsert(btavl_t *ctx, void *data, btavlComp_t (*compare)(void *a, void *
 	ctx->end->next = ins;
 	ctx->end = ins;
 
-	btavlHeight(ctx, ins);
+	btavlRecalcHeight(ctx, ins);
 
 	btavlBalance(ctx, ins, BTAVL_GETDIRECTION(direction), BTAVL_MODE_INSERT);
 
